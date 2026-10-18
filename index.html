@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Expense Analyzer — Credit card &amp; household budget analysis</title>
+<meta name="description" content="Upload credit card and bank statements, auto-categorize every transaction with AI, track a household budget with savings goals, and export a polished Excel report. Free, runs on your own machine." />
+<link rel="icon" href="data:,">
+<style>
+  :root {
+    --bg: #1b2142;
+    --bg-soft: #232c54;
+    --card: #28315c;
+    --border: #3b4677;
+    --text: #f3f4fb;
+    --muted: #aeb7dd;
+    --accent: #7d9bff;
+    --accent-2: #4eeec0;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: radial-gradient(1200px 600px at 20% -10%, #324180 0%, var(--bg) 60%);
+    color: var(--text);
+    line-height: 1.55;
+    overflow-x: hidden;
+  }
+  a { color: inherit; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+  .bg-blob {
+    position: fixed; border-radius: 50%; filter: blur(90px); z-index: 0; pointer-events: none;
+    opacity: 0.35; animation: float 18s ease-in-out infinite;
+  }
+  .bg-blob.one { width: 420px; height: 420px; top: -120px; left: -100px; background: var(--accent); }
+  .bg-blob.two { width: 460px; height: 460px; top: 40vh; right: -140px; background: var(--accent-2); animation-delay: -6s; }
+  .bg-blob.three { width: 380px; height: 380px; bottom: -120px; left: 30vw; background: #9b7dff; animation-delay: -11s; }
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(30px, -40px) scale(1.08); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bg-blob { animation: none; }
+  }
+  header.nav {
+    position: sticky; top: 0; z-index: 10;
+    backdrop-filter: blur(10px);
+    background: rgba(11, 16, 32, 0.75);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav .wrap { display: flex; align-items: center; justify-content: space-between; padding-top: 14px; padding-bottom: 14px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.05rem; }
+  .brand .dot { width: 10px; height: 10px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent-2)); }
+  nav.links { display: flex; gap: 22px; font-size: 0.92rem; color: var(--muted); }
+  nav.links a:hover { color: var(--text); }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 11px 18px; border-radius: 999px; font-weight: 600; font-size: 0.92rem;
+    text-decoration: none; border: 1px solid transparent; cursor: pointer;
+  }
+  .btn { transition: transform 0.2s ease, filter 0.2s ease, background 0.2s ease; }
+  .btn:hover { transform: translateY(-2px); }
+  .btn-primary { background: linear-gradient(135deg, var(--accent), #8f6cff); color: white; }
+  .btn-primary:hover { filter: brightness(1.1); }
+  .btn-ghost { border-color: var(--border); color: var(--text); background: transparent; }
+  .btn-ghost:hover { background: var(--bg-soft); }
+  .btn-sm { padding: 8px 14px; font-size: 0.85rem; }
+
+  .hero { padding: 88px 0 56px; text-align: center; }
+  .eyebrow {
+    display: inline-block; font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--accent-2); border: 1px solid var(--border); background: var(--bg-soft);
+    padding: 6px 14px; border-radius: 999px; margin-bottom: 20px;
+  }
+  h1 { font-size: clamp(2.1rem, 4.5vw, 3.4rem); margin: 0 0 18px; letter-spacing: -0.02em; }
+  h1 span { background: linear-gradient(135deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .lede { max-width: 640px; margin: 0 auto 36px; color: var(--muted); font-size: 1.08rem; }
+  .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 14px; }
+  .fine-print { color: var(--muted); font-size: 0.85rem; }
+
+  section { padding: 56px 0; border-top: 1px solid var(--border); }
+  h2 { font-size: 1.7rem; margin: 0 0 8px; }
+  .section-sub { color: var(--muted); margin: 0 0 36px; max-width: 620px; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; }
+  .card {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 22px; transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  .card:hover {
+    transform: translateY(-4px); border-color: var(--accent);
+    box-shadow: 0 16px 36px -18px rgba(125, 155, 255, 0.45);
+  }
+  .card .icon { font-size: 1.5rem; margin-bottom: 10px; display: block; }
+  .card h3 { margin: 0 0 8px; font-size: 1.02rem; }
+  .card p { margin: 0; color: var(--muted); font-size: 0.92rem; }
+
+  .downloads { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+  .download-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 26px; text-align: center; transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  .download-card:hover {
+    transform: translateY(-4px); border-color: var(--accent);
+    box-shadow: 0 16px 36px -18px rgba(125, 155, 255, 0.45);
+  }
+  .download-card .os-icon { font-size: 2.2rem; margin-bottom: 10px; }
+  .download-card h3 { margin: 0 0 6px; }
+  .download-card p { color: var(--muted); font-size: 0.85rem; margin: 0 0 18px; }
+  .download-card .btn { width: 100%; justify-content: center; }
+
+  .steps { counter-reset: step; display: grid; gap: 16px; }
+  .step { display: flex; gap: 16px; align-items: flex-start; }
+  .step .num {
+    counter-increment: step; flex-shrink: 0;
+    width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    background: var(--bg-soft); border: 1px solid var(--border); font-weight: 700; font-size: 0.9rem;
+  }
+  .step .num::before { content: counter(step); }
+  .step p { margin: 4px 0 0; color: var(--muted); }
+  .step strong { color: var(--text); }
+
+  footer { border-top: 1px solid var(--border); padding: 32px 0; color: var(--muted); font-size: 0.85rem; text-align: center; }
+  footer a { color: var(--accent); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  code { background: var(--bg-soft); padding: 2px 6px; border-radius: 6px; font-size: 0.85em; border: 1px solid var(--border); }
+
+  .showcase { display: grid; gap: 64px; }
+  .showcase-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center;
+  }
+  .showcase-row.reverse .shot-col { order: 2; }
+  .showcase-row.reverse .text-col { order: 1; }
+  .text-col .tag {
+    display: inline-block; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.04em;
+    color: var(--accent-2); margin-bottom: 10px;
+  }
+  .text-col h3 { font-size: 1.4rem; margin: 0 0 12px; }
+  .text-col p { color: var(--muted); margin: 0; }
+  .browser-frame {
+    border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border);
+    background: #171f45; box-shadow: 0 20px 50px -20px rgba(0,0,0,0.55);
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+  }
+  .browser-frame:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 28px 60px -20px rgba(125, 155, 255, 0.35);
+  }
+  .browser-frame .chrome {
+    display: flex; gap: 6px; padding: 10px 14px; background: #1c2550; border-bottom: 1px solid var(--border);
+  }
+  .browser-frame .chrome span { width: 10px; height: 10px; border-radius: 50%; background: #4a5590; }
+  .browser-frame img { display: block; width: 100%; height: auto; }
+
+  .note {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 28px 32px; max-width: 760px; margin: 0 auto;
+  }
+  .note p { margin: 0 0 12px; color: var(--muted); }
+  .note p:last-child { margin-bottom: 0; }
+  .note .signoff { color: var(--text); font-weight: 600; }
+
+  .reveal {
+    opacity: 0; transform: translateY(28px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+  .grid .reveal:nth-child(2) { transition-delay: 0.08s; }
+  .grid .reveal:nth-child(3) { transition-delay: 0.16s; }
+  .grid .reveal:nth-child(4) { transition-delay: 0.24s; }
+  .downloads .reveal:nth-child(2) { transition-delay: 0.08s; }
+  .downloads .reveal:nth-child(3) { transition-delay: 0.16s; }
+  .steps .reveal:nth-child(2) { transition-delay: 0.06s; }
+  .steps .reveal:nth-child(3) { transition-delay: 0.12s; }
+  .steps .reveal:nth-child(4) { transition-delay: 0.18s; }
+  .steps .reveal:nth-child(5) { transition-delay: 0.24s; }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+  }
+
+  @media (max-width: 760px) {
+    nav.links { gap: 14px; font-size: 0.82rem; flex-wrap: wrap; justify-content: flex-end; }
+    .nav .wrap { flex-wrap: wrap; row-gap: 8px; }
+    .hero { padding: 56px 0 40px; }
+    .showcase-row { grid-template-columns: 1fr; gap: 20px; }
+    .showcase-row.reverse .shot-col,
+    .showcase-row.reverse .text-col { order: initial; }
+    .note { padding: 22px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-blob one"></div>
+<div class="bg-blob two"></div>
+<div class="bg-blob three"></div>
+
+<header class="nav">
+  <div class="wrap">
+    <div class="brand"><span class="dot"></span> Expense Analyzer</div>
+    <nav class="links">
+      <a href="#screenshots">See it in action</a>
+      <a href="#download">Download</a>
+      <a href="#how-it-works">How it works</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <h1>I got tired of guessing<br/><span>where our money went each month</span></h1>
+    <p class="lede">
+      So I built this: drop in your credit card and bank statements, let it
+      sort every purchase into a category, and see exactly how your
+      household's income, mortgage, and savings goal actually add up — down
+      to the dollar. No spreadsheet gymnastics, no subscription, no cloud
+      upload. It just runs on your own machine.
+    </p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="#download">Download desktop app</a>
+    </div>
+    <p class="fine-print">Free. Your statements never leave your computer.</p>
+  </div>
+</section>
+
+
+<section id="screenshots">
+  <div class="wrap">
+    <h2>What it actually looks like</h2>
+    <p class="section-sub">Real screens from the app (with made-up sample numbers, not anyone's actual statement).</p>
+    <div class="showcase">
+      <div class="showcase-row reveal">
+        <div class="shot-col">
+          <div class="browser-frame">
+            <div class="chrome"><span></span><span></span><span></span></div>
+            <img src="assets/screenshot-analyzer.png" alt="Spending Analyzer tab showing an uploaded statement, a category donut chart, and a ranked spending table" loading="lazy" />
+          </div>
+        </div>
+        <div class="text-col">
+          <span class="tag">UPLOAD &amp; CATEGORIZE</span>
+          <h3>Upload a statement, get an instant breakdown</h3>
+          <p>
+            Drop in as many credit card and bank statements as you have for the
+            month — they're combined automatically. Every transaction gets a
+            category, a cleaned-up merchant name, and a spot in the donut chart
+            and ranked table below. One click exports the whole thing to a
+            polished Excel report.
+          </p>
+        </div>
+      </div>
+
+      <div class="showcase-row reverse reveal">
+        <div class="shot-col">
+          <div class="browser-frame">
+            <div class="chrome"><span></span><span></span><span></span></div>
+            <img src="assets/screenshot-insights.png" alt="Spending Insights tab showing a bar chart of spending by category across a selected period" loading="lazy" />
+          </div>
+        </div>
+        <div class="text-col">
+          <span class="tag">SPENDING INSIGHTS</span>
+          <h3>Pick a period, see the pattern</h3>
+          <p>
+            Zoom out to any range — one month, three months, a full year — and
+            see spending by category as a bar chart. Click any bar to drill
+            straight into the transactions behind it: what it was, where, and
+            when.
+          </p>
+        </div>
+      </div>
+
+      <div class="showcase-row reveal">
+        <div class="shot-col">
+          <div class="browser-frame">
+            <div class="chrome"><span></span><span></span><span></span></div>
+            <img src="assets/screenshot-budget.png" alt="Household Budget tab showing combined income, savings allocation, and a flagged over-budget category with a catch-up plan for next month" loading="lazy" />
+          </div>
+        </div>
+        <div class="text-col">
+          <span class="tag">HOUSEHOLD BUDGET</span>
+          <h3>The part I actually built this for</h3>
+          <p>
+            Enter both incomes (any pay schedule — biweekly, twice-monthly,
+            whatever), the mortgage, and a savings percentage you want set
+            aside from every paycheck. Set an expected spend per category, and
+            if you go over, it's flagged — with the exact amount you're over
+            by, and how much less to spend next month to catch back up.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="note reveal">
+      <p>
+        I built this for my own household — tracking spending across two
+        people's credit cards, a shared mortgage, and the occasional
+        e-transfer that never shows up on a statement. Every feature exists
+        because we actually wanted it: the carry-over catch-up math, the
+        "80% to savings" allocation, the ability to say something was
+        "Other" and have it stay that way next time I check that month.
+      </p>
+      <p class="signoff">If it's useful to you too, it's free — download it below.</p>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap">
+    <h2>A few more things it does</h2>
+    <p class="section-sub">Not every feature gets its own screenshot — here's the rest.</p>
+    <div class="grid">
+      <div class="card reveal">
+        <h3>Multi-statement uploads, organized by month</h3>
+        <p>Several credit cards, bank statements, and cash/e-transfer entries per month, all combined and kept for whenever you navigate back to that month.</p>
+      </div>
+      <div class="card reveal">
+        <h3>AI categorization, with your own key</h3>
+        <p>Bring an OpenAI or Gemini key to auto-sort transactions and clean up cryptic merchant names. Manual corrections are remembered for next time.</p>
+      </div>
+      <div class="card reveal">
+        <h3>Professional Excel export</h3>
+        <p>A multi-sheet .xlsx workbook — summary totals, category rankings with heat-map coloring, and the full transaction list — ready to share or archive.</p>
+      </div>
+      <div class="card reveal">
+        <h3>Share it on your home network</h3>
+        <p>Run it once and let everyone in the household open the same budget from their own phone or laptop, no separate install.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="download">
+  <div class="wrap">
+    <h2>Download the desktop app</h2>
+    <p class="section-sub">
+      No installation, no Node.js required — each download bundles its own
+      runtime. Unzip, double-click to start, and your browser opens
+      automatically. Your data is saved locally in a <code>data</code> folder
+      next to the app.
+    </p>
+    <div class="downloads">
+      <div class="download-card reveal">
+        <div class="os-icon">🪟</div>
+        <h3>Windows</h3>
+        <p>Unzip, then double-click <code>Start CreditCardAnalyzer.bat</code></p>
+        <a class="btn btn-primary" href="https://github.com/Tedderic1991/credit-card-analyzer-site/releases/latest/download/CreditCardAnalyzer-windows-x64.zip">Download for Windows</a>
+      </div>
+      <div class="download-card reveal">
+        <div class="os-icon">🍎</div>
+        <h3>macOS</h3>
+        <p>Unzip, right-click <code>Start CreditCardAnalyzer.command</code> → Open</p>
+        <a class="btn btn-primary" href="https://github.com/Tedderic1991/credit-card-analyzer-site/releases/latest/download/CreditCardAnalyzer-macos-x64.zip">Download for macOS</a>
+      </div>
+      <div class="download-card reveal">
+        <div class="os-icon">🐧</div>
+        <h3>Linux</h3>
+        <p>Unzip, then run <code>./start.sh</code> from a terminal</p>
+        <a class="btn btn-primary" href="https://github.com/Tedderic1991/credit-card-analyzer-site/releases/latest/download/CreditCardAnalyzer-linux-x64.zip">Download for Linux</a>
+      </div>
+    </div>
+    <p class="fine-print" style="text-align:center; margin-top: 22px;">
+      Check the
+      <a href="https://github.com/Tedderic1991/credit-card-analyzer-site/releases">releases page</a>
+      for all versions and release notes.
+    </p>
+  </div>
+</section>
+
+<section id="how-it-works">
+  <div class="wrap">
+    <h2>How it works</h2>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="num"></div>
+        <div><strong>Download &amp; start.</strong><p>Unzip the folder for your OS and double-click the start script. A local server starts and your browser opens to it automatically.</p></div>
+      </div>
+      <div class="step reveal">
+        <div class="num"></div>
+        <div><strong>Upload your statements.</strong><p>Drag in credit card and bank statement exports (.csv, .xlsx, .xls) for the month. Upload as many as you need — they're combined automatically.</p></div>
+      </div>
+      <div class="step reveal">
+        <div class="num"></div>
+        <div><strong>Review categorization.</strong><p>Built-in rules (optionally boosted with your own AI key) sort every transaction into a category. Fix anything that needs a manual nudge — it's remembered for next time.</p></div>
+      </div>
+      <div class="step reveal">
+        <div class="num"></div>
+        <div><strong>Set your household budget.</strong><p>Enter income for both partners (any pay frequency), fixed costs, a savings percentage, and expected spend per category.</p></div>
+      </div>
+      <div class="step reveal">
+        <div class="num"></div>
+        <div><strong>See where you stand.</strong><p>Spending insights, green/red monthly status, flagged overspending with carryover, and a ready-to-export Excel report.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    Expense Analyzer is a personal finance tool.
+    <a href="https://github.com/Tedderic1991/credit-card-analyzer-site/releases">Releases</a>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var revealEls = document.querySelectorAll('.reveal');
+    if (!('IntersectionObserver' in window) || !revealEls.length) {
+      revealEls.forEach(function (el) { el.classList.add('in'); });
+      return;
+    }
+    var observer = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
+    );
+    revealEls.forEach(function (el) { observer.observe(el); });
+  })();
+</script>
+
+</body>
+</html>
