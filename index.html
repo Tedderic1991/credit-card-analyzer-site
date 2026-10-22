@@ -244,8 +244,9 @@
           <span class="tag">UPLOAD &amp; CATEGORIZE</span>
           <h3>Upload a statement, get an instant breakdown</h3>
           <p>
-            Drop in as many credit card and bank statements as you have for the
-            month — they're combined automatically. Every transaction gets a
+            Drop in CSV, Excel, or supported text-based PDF statements — even
+            files covering several months. Transactions are grouped into separate
+            monthly reports automatically. Every transaction gets a
             category, a cleaned-up merchant name, and a spot in the donut chart
             and ranked table below. One click exports the whole thing to a
             polished Excel report.
@@ -318,7 +319,7 @@
     <div class="grid">
       <div class="card reveal">
         <h3>Multi-statement uploads, organized by month</h3>
-        <p>Several credit cards, bank statements, and cash/e-transfer entries per month, all combined and kept for whenever you navigate back to that month.</p>
+        <p>Upload CSV, Excel, or supported text-based PDF statements spanning several months. Transaction dates create separate monthly reports, while several accounts can be combined within each month.</p>
       </div>
       <div class="card reveal">
         <h3>AI categorization, with your own key</h3>
@@ -341,16 +342,17 @@
     <h2>Download the desktop app</h2>
     <p class="section-sub">
       No installation, no Node.js required — each download bundles its own
-      runtime. Unzip, double-click to start, and your browser opens
-      automatically. Your data is saved locally in a <code>data</code> folder
-      next to the app.
+      runtime. On Windows, double-click the EXE to open the app in its own
+      window; your data is saved in your Windows user profile. On macOS and
+      Linux, unzip and run the start script to open your browser; data stays
+      in the <code>data</code> folder next to the app.
     </p>
     <div class="downloads">
       <div class="download-card reveal">
         <div class="os-icon">🪟</div>
         <h3>Windows</h3>
-        <p>Unzip, then double-click <code>Start CreditCardAnalyzer.bat</code></p>
-        <a class="btn btn-primary" href="https://github.com/Tedderic1991/credit-card-analyzer-site/releases/latest/download/CreditCardAnalyzer-windows-x64.zip">Download for Windows</a>
+        <p>Double-click the portable EXE to open the app. No installation needed. Windows may show an unsigned-app warning.</p>
+        <a class="btn btn-primary" href="https://github.com/Tedderic1991/credit-card-analyzer-site/releases/latest/download/CreditCardAnalyzer-windows-x64.exe">Download for Windows (.exe)</a>
       </div>
       <div class="download-card reveal">
         <div class="os-icon">🍎</div>
@@ -366,6 +368,10 @@
       </div>
     </div>
     <p class="fine-print" style="text-align:center; margin-top: 22px;">
+      Switching from the Windows ZIP to the EXE? Existing data is not migrated
+      automatically. Keep a backup of your old <code>data</code> folder.
+    </p>
+    <p class="fine-print" style="text-align:center; margin-top: 22px;">
       Check the
       <a href="https://github.com/Tedderic1991/credit-card-analyzer-site/releases">releases page</a>
       for all versions and release notes.
@@ -379,11 +385,11 @@
     <div class="steps">
       <div class="step reveal">
         <div class="num"></div>
-        <div><strong>Download &amp; start.</strong><p>Unzip the folder for your OS and double-click the start script. A local server starts and your browser opens to it automatically.</p></div>
+        <div><strong>Download &amp; start.</strong><p>On Windows, double-click the EXE to open the app. On macOS and Linux, unzip the folder and run the start script to open it in your browser.</p></div>
       </div>
       <div class="step reveal">
         <div class="num"></div>
-        <div><strong>Upload your statements.</strong><p>Drag in credit card and bank statement exports (.csv, .xlsx, .xls) for the month. Upload as many as you need — they're combined automatically.</p></div>
+        <div><strong>Upload your statements.</strong><p>Drag in CSV, Excel (.xlsx, .xls), or supported text-based PDF exports. Files spanning several months are split into monthly reports automatically. PDFs need separate Date, Description, and Amount columns and dates with four-digit years; scanned and password-protected PDFs are not supported.</p></div>
       </div>
       <div class="step reveal">
         <div class="num"></div>
